@@ -1,0 +1,6 @@
+from brain.config.settings import BRAIN_NAME, CHAT_MODEL, VAULT_PATH, COLLECTION_NAME
+
+print(BRAIN_NAME)
+print(CHAT_MODEL)
+print(VAULT_PATH)
+print(COLLECTION_NAME)

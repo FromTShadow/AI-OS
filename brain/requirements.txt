@@ -1,0 +1,6 @@
+qdrant-client
+requests
+httpx
+pydantic
+python-dotenv
+watchdog
