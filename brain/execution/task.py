@@ -23,5 +23,10 @@ class Task:
     primary_role: Optional[str] = None
     specialists: List[str] = field(default_factory=list)
 
+    system_prompt: Optional[Any] = None
+    specialist_prompt: Optional[Any] = None
+
+    prompt_versions: Dict[str, str] = field(default_factory=dict)
+
     metadata: Dict[str, Any] = field(default_factory=dict)
     errors: List[str] = field(default_factory=list)

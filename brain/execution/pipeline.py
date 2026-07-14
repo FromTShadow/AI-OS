@@ -24,11 +24,13 @@ from brain.execution.task import Task
 from brain.memory.search import MemorySearch
 from brain.models.ollama import OllamaClient
 from brain.planner.planner import Planner
+from brain.router.router import SpecialistRouter
 
 
 class ExecutionPipeline:
     def __init__(self):
         self.planner = Planner()
+        self.router = SpecialistRouter()
         self.memory = MemorySearch()
         self.compressor = MemoryCompressor()
         self.ollama = OllamaClient()
@@ -43,17 +45,10 @@ class ExecutionPipeline:
 
     def run_planning(self, task: Task) -> Task:
         task.plan = self.planner.classify(task.query)
-        task.primary_role = task.plan["primary_role"]
-
-        needs = task.plan.get("needs", {})
-
-        task.specialists = [
-            role
-            for role, is_needed in needs.items()
-            if is_needed and role != "memory"
-        ]
-
         return task
+
+    def run_routing(self, task: Task) -> Task:
+        return self.router.route(task)
 
     def run_memory_retrieval(self, task: Task, limit: int = 5) -> Task:
         needs_memory = task.plan.get("needs", {}).get("memory", True)
@@ -93,34 +88,36 @@ class ExecutionPipeline:
         return task
 
     def build_prompt(self, task: Task) -> Task:
+        if task.system_prompt is None:
+            raise RuntimeError("System prompt was not loaded by the Router.")
+
+        if task.specialist_prompt is None:
+            raise RuntimeError("Specialist prompt was not loaded by the Router.")
+
         specialists = ", ".join(task.specialists) or task.primary_role or "general"
 
         task.prompt = f"""
-You are the AI Brain for Nejc's local AI Operating System.
+    {task.system_prompt.content}
 
-Execution plan:
+## Active Specialist
+
+    {task.specialist_prompt.content}
+
+## Execution Plan
+
 - Primary role: {task.primary_role}
 - Specialists involved: {specialists}
 
-Role guidance:
-- developer: practical implementation, architecture, and production-quality code
-- research: structured research, comparisons, evidence, and uncertainty
-- second_brain: Obsidian organization, knowledge management, and useful links
-- trading: systematic testing, data, automation, and risk management
-- ceo: priorities, roadmaps, trade-offs, ROI, and avoiding overengineering
+## Retrieved Memory
 
-Use the retrieved memory only when relevant.
-Do not pretend the memory contains information that is not present.
-Clearly identify important missing information when necessary.
+    {task.context}
 
-Memory context:
-{task.context}
+## User Request
 
-User request:
-{task.query}
+    {task.query}
 
 Provide a clear and practical response.
-""".strip()
+""" .strip()
 
         return task
 
@@ -145,6 +142,7 @@ Provide a clear and practical response.
 
         try:
             self.run_planning(task)
+            self.run_routing(task)
             self.run_memory_retrieval(task, limit=memory_limit)
             self.build_context(task)
             self.build_prompt(task)

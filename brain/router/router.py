@@ -59,17 +59,31 @@ class SpecialistRouter:
 
         return specialists
 
-    def route(self, plan: Dict) -> RouteDecision:
+    def route(self, task):
         primary_role = self.normalize_role(
-            plan.get("primary_role", "ceo")
+            task.plan.get("primary_role", "ceo")
         )
 
-        specialists = self.active_specialists(plan)
+        specialists = self.active_specialists(task.plan)
         bundle = self.loader.load_bundle(primary_role)
 
-        return RouteDecision(
-            primary_role=primary_role,
-            specialists=specialists,
-            system_prompt=bundle["system"],
-            primary_prompt=bundle["specialist"],
-        )
+        task.primary_role = primary_role
+        task.specialists = specialists
+        task.system_prompt = bundle["system"]
+        task.specialist_prompt = bundle["specialist"]
+
+        task.prompt_versions = {
+            "system": task.system_prompt.version,
+            primary_role: task.specialist_prompt.version,
+        }
+
+        task.metadata["route"] = {
+            "primary_role": primary_role,
+            "specialists": specialists,
+            "system_prompt": task.system_prompt.name,
+            "system_prompt_version": task.system_prompt.version,
+            "specialist_prompt": task.specialist_prompt.name,
+            "specialist_prompt_version": task.specialist_prompt.version,
+        }
+
+        return task

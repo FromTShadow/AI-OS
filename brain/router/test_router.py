@@ -1,3 +1,4 @@
+from brain.execution.task import Task
 from brain.planner.planner import Planner
 from brain.router.router import SpecialistRouter
 
@@ -13,26 +14,31 @@ queries = [
 ]
 
 for query in queries:
-    plan = planner.classify(query)
-    route = router.route(plan)
+    task = Task(query=query)
+    task.plan = planner.classify(query)
+
+    task = router.route(task)
 
     print("\n" + "=" * 60)
-    print("Query:", query)
-    print("Primary role:", route.primary_role)
-    print("Specialists:", route.specialists)
+    print("Query:", task.query)
+    print("Primary role:", task.primary_role)
+    print("Specialists:", task.specialists)
     print(
         "System prompt:",
-        route.system_prompt.name,
-        route.system_prompt.version,
+        task.system_prompt.name,
+        task.system_prompt.version,
     )
     print(
-        "Primary prompt:",
-        route.primary_prompt.name,
-        route.primary_prompt.version,
+        "Specialist prompt:",
+        task.specialist_prompt.name,
+        task.specialist_prompt.version,
     )
+    print("Prompt versions:", task.prompt_versions)
 
-    assert route.primary_role == plan["primary_role"]
-    assert route.primary_prompt.name == route.primary_role
-    assert route.primary_prompt.content
+    assert task.primary_role == task.plan["primary_role"]
+    assert task.specialist_prompt.name == task.primary_role
+    assert task.system_prompt.content
+    assert task.specialist_prompt.content
+    assert task.metadata["route"]["primary_role"] == task.primary_role
 
-print("\nRouter test passed.")
+print("\nTask-based Router test passed.")
