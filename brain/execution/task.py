@@ -14,6 +14,10 @@ class Task:
     query: str
 
     plan: Dict[str, Any] = field(default_factory=dict)
+
+    current_state: Dict[str, Any] = field(default_factory=dict)
+    state_context: str = ""
+
     memory_results: List[Any] = field(default_factory=list)
 
     context: str = ""

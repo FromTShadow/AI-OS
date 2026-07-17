@@ -19,6 +19,7 @@ Future stages will add:
 from time import perf_counter
 from typing import Any, List
 
+from brain.state.provider import StateProvider
 from brain.memory.compression import MemoryCompressor
 from brain.execution.task import Task
 from brain.memory.search import MemorySearch
@@ -29,8 +30,13 @@ from brain.router.router import SpecialistRouter
 
 class ExecutionPipeline:
     def __init__(self):
+        self.state = StateProvider()
         self.planner = Planner()
         self.router = SpecialistRouter()
+        self.planner = Planner()
+        self.router = SpecialistRouter()
+        self.state = StateProvider()
+        self.memory = MemorySearch()
         self.memory = MemorySearch()
         self.compressor = MemoryCompressor()
         self.ollama = OllamaClient()
@@ -49,6 +55,19 @@ class ExecutionPipeline:
 
     def run_routing(self, task: Task) -> Task:
         return self.router.route(task)
+    def load_current_state(self, task: Task) -> Task:
+        task.current_state = self.state.snapshot()
+        task.state_context = self.state.format_context(
+            task.current_state
+        )
+
+        task.metadata["state"] = {
+            "version": task.current_state.get("version"),
+            "current_focus": task.current_state.get("current_focus"),
+            "next_focus": task.current_state.get("next_focus"),
+        }
+
+        return task
 
     def run_memory_retrieval(self, task: Task, limit: int = 5) -> Task:
         needs_memory = task.plan.get("needs", {}).get("memory", True)
@@ -71,6 +90,7 @@ class ExecutionPipeline:
         )
 
         task.context = compressed.context
+
 
         task.metadata["retrieved_memory_count"] = len(
             task.memory_results
@@ -108,6 +128,10 @@ class ExecutionPipeline:
 - Primary role: {task.primary_role}
 - Specialists involved: {specialists}
 
+## Current Project State
+
+    {task.state_context}
+
 ## Retrieved Memory
 
     {task.context}
@@ -143,6 +167,7 @@ Provide a clear and practical response.
         try:
             self.run_planning(task)
             self.run_routing(task)
+            self.load_current_state(task)
             self.run_memory_retrieval(task, limit=memory_limit)
             self.build_context(task)
             self.build_prompt(task)
