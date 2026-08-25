@@ -10,13 +10,12 @@ print("STATE PROVIDER TEST")
 print("=" * 60)
 print(context)
 
-assert state["project"] == "AI-OS"
-assert state["modules"]["planner"] == "complete"
-assert state["modules"]["router"] == "complete"
-assert state["modules"]["state_provider"] == "complete"
-assert state["current_focus"] == "Memory compression"
 assert state["modules"]["memory_ranker"] == "complete"
-assert state["next_focus"] == "Pipeline tests and LLM Planner preparation"
+assert state["modules"]["memory_compressor"] == "complete"
+assert state["modules"]["context_builder"] == "complete"
+
+assert state["current_focus"] == "Pipeline testing and observability"
+assert state["next_focus"] == "LLM Planner preparation"
 
 assert "Current focus:" in context
 assert "Next focus:" in context
