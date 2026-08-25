@@ -22,6 +22,7 @@ from typing import Any, List
 from brain.state.provider import StateProvider
 from brain.memory.compression import MemoryCompressor
 from brain.execution.task import Task
+from brain.memory.ranking import MemoryRanker
 from brain.memory.search import MemorySearch
 from brain.models.ollama import OllamaClient
 from brain.planner.planner import Planner
@@ -33,11 +34,8 @@ class ExecutionPipeline:
         self.state = StateProvider()
         self.planner = Planner()
         self.router = SpecialistRouter()
-        self.planner = Planner()
-        self.router = SpecialistRouter()
-        self.state = StateProvider()
         self.memory = MemorySearch()
-        self.memory = MemorySearch()
+        self.memory_ranker = MemoryRanker()
         self.compressor = MemoryCompressor()
         self.ollama = OllamaClient()
 
@@ -69,16 +67,34 @@ class ExecutionPipeline:
 
         return task
 
-    def run_memory_retrieval(self, task: Task, limit: int = 5) -> Task:
-        needs_memory = task.plan.get("needs", {}).get("memory", True)
+    def run_memory_retrieval(
+        self,
+        task: Task,
+        limit: int = 5,
+        candidate_limit: int = 15,
+    ) -> Task:
+        needs_memory = task.plan.get("needs", {}).get(
+            "memory",
+            True,
+        )
 
         if not needs_memory:
             task.memory_results = []
             return task
 
-        task.memory_results = self.memory.search(
+        candidates = self.memory.candidates(
             task.query,
+            limit=candidate_limit,
+        )
+
+        task.memory_results = self.memory_ranker.rank(
+            query=task.query,
+            results=candidates,
             limit=limit,
+        )
+
+        task.metadata["memory_candidate_count"] = len(
+            candidates
         )
 
         return task

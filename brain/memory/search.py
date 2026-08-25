@@ -28,6 +28,17 @@ class MemorySearch:
 
         return results.points
 
+    def candidates(self, query: str, limit: int = 15) -> List[Any]:
+        raw_results = self.raw_search(
+            query,
+            limit=max(limit * 4, 20),
+        )
+
+        unique_notes = self.group_by_note(raw_results)
+
+        return unique_notes[:limit]
+
+
     def note_key(self, result: Any) -> str:
         payload = result.payload or {}
 
@@ -66,7 +77,7 @@ class MemorySearch:
         return "Low"
 
     def search(self, query: str, limit: int = 5) -> List[Any]:
-        raw_results = self.raw_search(query, limit=max(limit * 4, 20))
-        unique_notes = self.group_by_note(raw_results)
-
-        return unique_notes[:limit]
+        return self.candidates(
+            query=query,
+            limit=limit,
+        )
