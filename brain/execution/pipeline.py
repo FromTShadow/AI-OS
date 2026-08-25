@@ -178,6 +178,36 @@ state. Do not recommend work already marked as complete.
         task.answer = self.ollama.chat(task.prompt)
         return task
 
+    def run_timed_stage(
+        self,
+        task: Task,
+        stage_name: str,
+        stage,
+        *args,
+        **kwargs,
+    ) -> Task:
+        started_at = perf_counter()
+
+        task = stage(
+            task,
+            *args,
+            **kwargs,
+        )
+
+        elapsed = perf_counter() - started_at
+
+        timings = task.metadata.setdefault(
+            "stage_timings",
+            {},
+        )
+
+        timings[stage_name] = round(
+            elapsed,
+            4,
+        )
+
+        return task
+    
     def collect_metadata(self, task: Task, started_at: float) -> Task:
         task.metadata["duration_seconds"] = round(
             perf_counter() - started_at,
@@ -194,13 +224,48 @@ state. Do not recommend work already marked as complete.
         task = self.create_task(query)
 
         try:
-            self.run_planning(task)
-            self.run_routing(task)
-            self.load_current_state(task)
-            self.run_memory_retrieval(task, limit=memory_limit)
-            self.build_context(task)
-            self.build_prompt(task)
-            self.run_model(task)
+            task = self.run_timed_stage(
+                task,
+                "planning",
+                self.run_planning,
+            )
+
+            task = self.run_timed_stage(
+                task,
+                "routing",
+                self.run_routing,
+            )
+
+            task = self.run_timed_stage(
+                task,
+                "state",
+                self.load_current_state,
+            )
+
+            task = self.run_timed_stage(
+                task,
+                "memory_retrieval",
+                self.run_memory_retrieval,
+                limit=memory_limit,
+            )
+
+            task = self.run_timed_stage(
+                task,
+                "context_build",
+                self.build_context,
+            )
+
+            task = self.run_timed_stage(
+                task,
+                "prompt_build",
+                self.build_prompt,
+            )
+
+            task = self.run_timed_stage(
+                task,
+                "model",
+                self.run_model,
+            )
         except Exception as error:
             task.errors.append(f"{type(error).__name__}: {error}")
 
