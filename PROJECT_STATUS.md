@@ -197,13 +197,21 @@ rather than tightly coupling AI-OS to legacy Open WebUI Pipeline plugins.
 
 Current environment:
 
-`~/AI-OS/projects/knowledge-system/venv`
+`~/AI-OS/.venv`
 
 Current Python:
 
-`Python 3.9.6`
+`Python 3.13.15`
 
-This is temporary.
+Status:
+
+**Migration completed and end-to-end validated.**
+
+The previous environment:
+
+`~/AI-OS/projects/knowledge-system/venv`
+
+is retained temporarily as a rollback environment and should only be removed after the migration commit is finalized and one additional clean-start validation passes.
 
 ### Planned Migration
 
