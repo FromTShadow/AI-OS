@@ -10,16 +10,15 @@ It should always describe reality, not historical notes.
 CURRENT_STATE = {
     "project": "AI-OS",
 
-    "version": "0.3.2-dev",
+    "version": "0.3.3-dev",
 
     "git_commit": "1db052a",
 
     "modules": {
+        "memory_ranker": "complete",
         "planner": "complete",
         "pipeline": "complete",
         "memory_search": "complete",
-        "memory_compressor": "needs_improvement",
-        "context_builder": "in_progress",
         "prompt_loader": "complete",
         "router": "complete",
         "state_provider": "complete",
@@ -35,7 +34,6 @@ CURRENT_STATE = {
         "open_webui": True,
     },
 
-    "current_focus": "Context authority and state priority",
-
-    "next_focus": "Memory compression and pipeline tests",
+    "current_focus": "Memory compression",
+    "next_focus": "Pipeline tests and LLM Planner preparation",
 }

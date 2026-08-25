@@ -14,8 +14,10 @@ assert state["project"] == "AI-OS"
 assert state["modules"]["planner"] == "complete"
 assert state["modules"]["router"] == "complete"
 assert state["modules"]["state_provider"] == "complete"
-assert state["current_focus"] == "Context authority and state priority"
-assert state["next_focus"] == "Memory compression and pipeline tests"
+assert state["current_focus"] == "Memory compression"
+assert state["modules"]["memory_ranker"] == "complete"
+assert state["next_focus"] == "Pipeline tests and LLM Planner preparation"
+
 assert "Current focus:" in context
 assert "Next focus:" in context
 
