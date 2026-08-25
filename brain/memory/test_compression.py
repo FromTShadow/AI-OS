@@ -6,10 +6,7 @@ query = "What should I prioritize next in my AI OS project?"
 search = MemorySearch()
 results = search.search(query, limit=5)
 
-compressor = MemoryCompressor(
-    max_total_characters=3500,
-    max_characters_per_source=900,
-)
+compressor = MemoryCompressor()
 
 compressed = compressor.compress(
     query=query,
@@ -36,3 +33,16 @@ if compressed.original_characters:
 
 print("\nCompressed context:\n")
 print(compressed.context)
+
+assert compressed.source_count > 0
+
+assert compressed.compressed_characters < compressed.original_characters, (
+    "Compression failed: output is not smaller than input."
+)
+
+assert (
+    compressed.compressed_characters
+    <= compressor.max_total_characters
+), "Compression exceeded the configured character budget."
+
+print("\nMemory Compressor test passed.")

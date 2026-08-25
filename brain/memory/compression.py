@@ -21,8 +21,8 @@ class CompressedMemory:
 class MemoryCompressor:
     def __init__(
         self,
-        max_total_characters: int = 3500,
-        max_characters_per_source: int = 900,
+        max_total_characters: int = 2200,
+        max_characters_per_source: int = 350,
     ):
         if max_total_characters <= 0:
             raise ValueError("max_total_characters must be greater than zero.")
@@ -143,15 +143,11 @@ class MemoryCompressor:
 
             title = payload.get("title", "Untitled")
             folder = payload.get("folder", "Unknown")
-            chunk_index = payload.get("chunk_index", 0)
 
             block = (
-                f"[Memory {index}]\n"
-                f"Title: {title}\n"
-                f"Folder: {folder}\n"
-                f"Chunk: {chunk_index}\n"
-                f"Relevant content:\n{content}"
-            )
+                f"[Memory {index}] {title} | {folder}\n"
+                f"{content}"
+)
 
             if (
                 total_characters + len(block)
