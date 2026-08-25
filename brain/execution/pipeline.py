@@ -117,31 +117,44 @@ class ExecutionPipeline:
         specialists = ", ".join(task.specialists) or task.primary_role or "general"
 
         task.prompt = f"""
-    {task.system_prompt.content}
+{task.system_prompt.content}
 
 ## Active Specialist
 
-    {task.specialist_prompt.content}
+{task.specialist_prompt.content}
 
 ## Execution Plan
 
 - Primary role: {task.primary_role}
 - Specialists involved: {specialists}
 
-## Current Project State
+## Authoritative Current Project State
 
-    {task.state_context}
+The following information describes the latest known implementation state
+of AI-OS. Treat it as the source of truth.
 
-## Retrieved Memory
+If retrieved memory conflicts with this state, always follow the current
+project state.
 
-    {task.context}
+{task.state_context}
+
+## Historical Project Memory
+
+The following retrieved notes provide supporting and historical context.
+They may contain older plans, completed tasks, or outdated project status.
+
+Use this memory for relevant details, but never allow it to override the
+authoritative current project state above.
+
+{task.context}
 
 ## User Request
 
-    {task.query}
+{task.query}
 
-Provide a clear and practical response.
-""" .strip()
+Provide a clear and practical response based on the authoritative current
+state. Do not recommend work already marked as complete.
+""".strip()
 
         return task
 
