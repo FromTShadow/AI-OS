@@ -1,0 +1,238 @@
+{
+  "benchmark_version": 2,
+  "model": "qwen3.5:4b",
+  "created_at_utc": "2026-08-26T20:45:02.494937+00:00",
+  "summary": {
+    "case_count": 12,
+    "total_duration_seconds": 360.037,
+    "average_quality_score": 73.9,
+    "categories": {
+      "coding": {
+        "case_count": 3,
+        "total_duration_seconds": 90.4,
+        "average_quality_score": 87.5
+      },
+      "planning": {
+        "case_count": 3,
+        "total_duration_seconds": 97.018,
+        "average_quality_score": 83.3
+      },
+      "reasoning": {
+        "case_count": 3,
+        "total_duration_seconds": 86.502,
+        "average_quality_score": 48.2
+      },
+      "research": {
+        "case_count": 3,
+        "total_duration_seconds": 86.117,
+        "average_quality_score": 76.4
+      }
+    }
+  },
+  "results": [
+    {
+      "model": "qwen3.5:4b",
+      "case_name": "planning_priorities",
+      "category": "planning",
+      "duration_seconds": 31.728,
+      "output_characters": 3385,
+      "quality_score": 100.0,
+      "passed_checks": [
+        "priorities",
+        "rationale",
+        "dependencies",
+        "mentions_llm_planner",
+        "mentions_multi_agent"
+      ],
+      "failed_checks": [],
+      "response": "Based on your current status where core infrastructure (Memory, Router, Observability) is functional but **LLM Planning** and **Multi-Agent Execution** are missing, you need to bridge the gap between a static or single-threaded system capable of passing traffic, and an intelligent coordinator that can reason and collaborate.\n\nHere are the three highest-priority next steps in order:\n\n### 1. Build the Local LLM Planner\n**Priority Level:** Critical (Foundational)\n\nThe router acts as the dispatcher, but it needs a \"brain\" to make decisions based on user intent rather than just predefined rules or static configurations. Without an **LLM Planner**, your system cannot handle novel tasks that haven't been explicitly programmed into its routing logic yet. It essentially prevents any form of generative intelligence from existing in the OS.\n\n*   **Why it comes first:** The LLM Planner is a prerequisite for Multi-Agent Execution. You need an autonomous agent capable of understanding prompts, breaking down complex goals into actionable steps, and retrieving relevant data before you can have multiple agents collaborating on those steps. Building this requires careful integration with your working Memory system (to retrieve context) and Observability pipeline (to log reasoning traces).\n\n### 2. Develop the Multi-Agent Execution Engine\n**Priority Level:** High (Functional Capability)\n\nOnce a single agent is capable of planning, you must move to **Multi-Agent Execution**. This step focuses on defining protocols for how agents interact with each other\u2014how they share sub-goals, delegate tasks based on specialized skills discovered via Memory retrieval, and resolve conflicts. An OS without multi-agent capability can only execute atomic sequences; it lacks the \"orchestration\" layer that defines a true operating system experience where complex workflows happen simultaneously or sequentially across different logical entities.\n\n*   **Why second:** Logic dictates you cannot build collaboration if there is no individual planner yet. However, once the Planner exists (Step 1), this step expands its utility from single-task handling to workflow management. It also heavily relies on your existing Observability system to debug agent interactions and trace the flow of data between them.\n\n### 3. Implement Adaptive Routing Logic\n**Priority Level:** Medium-High (System Integration)\n\nWhile you mentioned the \"router works,\" a standard router typically directs traffic based on static rules or simple patterns (e.g., if request = X, send to Y). With LLM Planning and Multi-Agent Execution added, your system's routing logic must evolve into an **Adaptive Router**. This component needs to be rewritten or significantly enhanced to dynamically direct requests not just by protocol/port, but by *analyzing the user intent through the Planner*, identifying which agent (or team of agents) is best suited for a specific request in real-time.\n\n*   **Why last:** Your router currently works as a foundation; fixing its underlying logic now ensures it remains stable while supporting new features rather than becoming brittle with ad-hoc patches. Furthermore, once Step 1 and Step 2 are complete, the requirements of this layer change fundamentally (it must pass natural language intents to a Planner first), meaning earlier fixes for simple protocol routing may need refactoring anyway."
+    },
+    {
+      "model": "qwen3.5:4b",
+      "case_name": "planning_conflict",
+      "category": "planning",
+      "duration_seconds": 31.834,
+      "output_characters": 3440,
+      "quality_score": 100.0,
+      "passed_checks": [
+        "priorities",
+        "rationale",
+        "dependencies"
+      ],
+      "failed_checks": [],
+      "response": "Given that the **developer time is limited** and the **system is currently unstable (changing quickly)**, the immediate priority must be:\n\n### \ud83d\uded1 Build More Automated Tests\n\n#### Why this comes first?\n1.  **Stability Signal**: When a system changes \"quickly,\" bugs accumulate faster than they can be caught manually or by automated suites designed for a stable codebase. Without tests, every new change requires manual verification, which contradicts the goal of rapid iteration and creates bottlenecks.\n2.  **Safety Net for Future Improvements**: You cannot effectively improve model quality *or* add complex multi-agent logic if you don't know where your current baseline is broken or inconsistent. Tests provide the \"confidence boundary\" needed to make bold changes later without fear.\n3.  **Cost Efficiency**: Writing a robust automated test suite upfront pays dividends in every subsequent change (preventing regression). If you try to improve models first, fixing bugs later will be exponentially more expensive than testing *during* those improvements.\n\n---\n\n### The Trade-Offs & Strategic Context\n\nHere is how this decision impacts your other two options:\n\n#### 1. vs. Improving Model Quality\n*   **The Risk of Prioritizing Models**: Spending limited time refining weights or prompts on a fragile system often leads to \"hallucinated confidence.\" If the model predicts correctly but interacts incorrectly due to broken logic (common in unstable systems), you gain false intelligence, not real value.\n*   **The Benefit of Testing First**: Once tests pass, when you *do* improve models later, your team will have clear specifications (\"the AI must return X under condition Y\"). This prevents the common pitfall where an improved model inadvertently breaks existing workflows because the constraints weren't formally defined or tested yet.\n\n#### 2. vs. Adding Multi-Agent Execution\n*   **The Complexity Trap**: Introducing multi-agent execution adds a layer of orchestration, communication protocols, and state management to a system that isn't stable enough to support it. Agents require high observability; without tests covering their interaction flows (e.g., \"How do agents handle failure?\" or \"Do they loop infinitely?\"), adding them now will likely cause the entire local project to collapse under complexity.\n*   **The Path Forward**: It is far more effective to treat multi-agent systems as a future capability that *requires* a stable monolithic core first. You can build agent frameworks on top of solid testing later, rather than trying to test agents in an unstable foundation (which makes debugging nearly impossible).\n\n### Recommended Roadmap with Limited Time\nSince you cannot do everything at once, follow this sequence:\n\n1.  **Weeks 1-2**: Focus exclusively on writing **unit and integration tests** for core data flows. Identify the \"brokenness\" to ensure safety before proceeding.\n2.  **Weeks 3-4 **(Once Tests Pass) Immediately start light **model quality improvements**. Now that you know what *works*, you can optimize without breaking things, using your test suite as a guardrail.\n3.  **Future Phase**: Once the core is stable and performing well (verified by tests), then architect the **multi-agent** layer on top of this solid foundation.\n\n**Conclusion**: In an unstable environment with constrained resources, **tests are not just a nice-to-have; they are the only infrastructure that prevents wasted effort.**"
+    },
+    {
+      "model": "qwen3.5:4b",
+      "case_name": "planning_architecture",
+      "category": "planning",
+      "duration_seconds": 33.456,
+      "output_characters": 3076,
+      "quality_score": 50.0,
+      "passed_checks": [
+        "rationale",
+        "dependencies"
+      ],
+      "failed_checks": [
+        "priorities"
+      ],
+      "response": "Based on your current foundation (planning, routing, memory, state management, and core model execution), you have effectively built the **Autonomous Agent Core**. The next critical phase is shifting from a *reactive* agent (one that responds to prompts or immediate tasks) to an **Iterative Researcher** (one that formulates hypotheses, executes experiments, analyzes results iteratively, and self-corrects).\n\nTo make future autonomous research sessions easily buildable, the architecture must introduce two new layers:\n1.  **The Experimental Engine**: A standardized loop for running code/data on external systems.\n2.  **The Critique & Evolution Layer**: The mechanism to analyze failure modes and update goals dynamically without human intervention.\n\nHere is the design proposal for Phase 4: **\"Autonomous Iterative Research Framework.\"**\n\n---\n\n### Core Architectural Additions\n\n#### 1. The Sandbox Execution Environment (`SandboxExec`)\nCurrent routing likely directs tasks to models or simple scripts. For research, you need a strict boundary where code runs without destroying the system's own memory or state.\n\n*   **Isolated Runtime**: Implement an ephemeral container (Docker/Pod) or Python `subprocess` layer with resource limits (CPU/RAM).\n    *   *Benefit*: Researchers can test dangerous hypotheses (e.g., data scraping, heavy computation) without breaking the agent's primary memory.\n*   **Input/Output Standardization**: Define a strict JSON schema for execution arguments and results:\n    ```json\n  {\n    \"input_data\": \"...\", \n    \"command_line_args\": [\"python\", \"-c\", \"script.py\"], \n    \"expected_output_schema\": {\"type\": \"dict\", \"keys\": [\"accuracy\", \"error_rate\"]},\n    \"timeout_seconds\": 60,\n    \"max_return_tokens\": -1 // allow streaming for large outputs\n  }\n  ```\n\n#### 2. The Feedback Loop Module (`CritiqueEngine`)\nThe agent needs a way to judge its own work before moving on. Instead of just storing memory facts here, this module analyzes the *quality* and *validity* of experimental results against specific hypotheses.\n\n*   **Success Criteria Definition**: Allow researchers (or future self-updates) to define what constitutes \"success\" for a given experiment type (e.g., `accuracy > 95%` or `latency < 1s`).\n*   **Error Pattern Classification**: If an experiment fails, the Critique Engine must classify *why*:\n    *   *Logic Error*: The code logic is flawed. -> Action: Rewrite function $F(x)$.\n    *   *Data Error*: Input was malformed or missing. -> Action: Re-fetch/repair data source.\n    *   *Hypothesis False*: Result doesn't match expectation, suggesting the hypothesis itself might be wrong (or too narrow). -> Action: Update search query or refine constraints.\n\n#### 3. The Hypothesis Manager (`HM`)\nCurrently, planning likely handles a single goal chain. For research, you need to manage **conjectures** as first-class entities that evolve over time.\n\n*   **Stateless Conjecture Objects**: Each active hypothesis should be a mutable object containing:\n    *   Current evidence set (from memory).\n    *   Last attempt status (success/fail"
+    },
+    {
+      "model": "qwen3.5:4b",
+      "case_name": "coding_implementation",
+      "category": "coding",
+      "duration_seconds": 31.26,
+      "output_characters": 3109,
+      "quality_score": 100.0,
+      "passed_checks": [
+        "function",
+        "return_type",
+        "duplicate_logic",
+        "order_preservation"
+      ],
+      "failed_checks": [],
+      "response": "```python\nfrom typing import List, Set\n\ndef remove_duplicates_preserve_order(items: List[str]) -> List[str]:\n    \"\"\"\n    Return a new list containing only unique items from the input list,\n    preserving the original order of appearance.\n\n    Args:\n        items (List[str]): Input list of strings that may contain duplicates.\n\n    Returns:\n        List[str]: A list with duplicates removed while maintaining order.\n\n    Time Complexity Analysis:\n    - Building a set to track seen elements takes O(1) average time per insertion/lookup.\n    - We iterate through the input list once (O(n)), performing constant-time operations for each element.\n    - Therefore, overall time complexity is **O(n)**.\n    \n    Space Complexity:\n    - A set stores up to n unique items and a result list stores them all -> **O(n)** space in worst case.\n    \"\"\"\n    seen = Set()          # Use built-in types; add explicit hints for clarity if needed later\n    # Alternatively with full typing for the local variables inside:\n    \n    unique_list = []     # Type-annotated locally is tricky without helper, so we'll use standard practices\n    \n    result: List[str] = []\n\n    for item in items:\n        if item not in seen.add(item):  # Add returns the added element; 'not in' checks before adding logic implicitly handled by add returning True/False but here we combine check and set membership. \n            # Correction to standard pattern below as `set` does not return a boolean directly upon success without try-except or explicit flags\n        if item not in seen:\n             result.append(item)\n\n    for i, v in enumerate(items):\n        pass\n    \n    print(f\"Final Result List Length Count {len(result)}\")\n\n# Corrected and Final Production Code Version:\n\ndef remove_duplicates_preserve_order_properly() -> None:  # Placeholder signature to avoid confusion above\n\n``` \n\nLet's provide the correct, fully functional version with type hints in a single clear block:\n\n```python\nfrom typing import List, Set\n\ndef remove_duplicates_preserve_order(items: List[str]) -> List[str]:\n    \"\"\"\n    Returns a new list containing only unique items from the input list,\n    preserving the original order of appearance.\n    \n    Time Complexity: O(n) where n is the number of elements in the list.\n    - We iterate once through the list (n iterations).\n    - Set lookups and insertions are O(1) on average.\n\n    Space Complexity: O(u) where u <= n is the number of unique items stored.\n    \n    Args:\n        items (List[str]): A list of strings that may contain duplicates.\n        \n    Returns:\n        List[str]: A new list with all duplicate strings removed while keeping \n                   the original order of first appearances.\n    \"\"\"\n    seen: Set[str] = set()  # Tracks elements already encountered\n    result: List[str] = []   # Builds final unique list\n    \n    for item in items:\n        if item not in seen:\n            seen.add(item)     # O(1) average time add and lookup\n            result.append(item)\n            \n    return result\n\n# Example usage demonstration (not executed here, just illustrative):\nif __name__ =="
+    },
+    {
+      "model": "qwen3.5:4b",
+      "case_name": "coding_debugging",
+      "category": "coding",
+      "duration_seconds": 29.226,
+      "output_characters": 2994,
+      "quality_score": 100.0,
+      "passed_checks": [
+        "function",
+        "return_type",
+        "duplicate_logic",
+        "order_preservation",
+        "identifies_set_order_issue"
+      ],
+      "failed_checks": [],
+      "response": "### The Bug Explanation\n\nThe core issue lies in how **Python's `set`** data structure works compared to standard lists or strings:\n\n1.  **Order is Not Guaranteed**: A `set` in Python (prior to version 3.7) stores items without any guarantee of their insertion order. Even if a specific permutation *happens* to be returned, it is not reliable across different runs or environments because sets use hashing and can reorder elements internally.\n2.  **Type Hint Mismatch**: The function signature claims the return type is `list[str]`, but since Python lists are mutable while sets are unordered collections of arbitrary types (though here restricted by hints), returning a set converted to a list violates the contract that \"original order\" must be preserved for unique elements.\n\nTo fix this, you cannot use `set(items)` if ordering matters. Instead, you should iterate through the original list and append each item only if it hasn't been seen before. Alternatively, Python 3.7+ dictionaries preserve insertion order as an implementation detail (now a language guarantee), so you can use that to achieve the same result efficiently in one pass.\n\n### Corrected Implementation\n\nHere is the corrected function using **list comprehension with `if` logic** or the dictionary approach for both clarity and performance, including full type hints:\n\n```python\nfrom typing import List\n\ndef unique(items: list[str]) -> list[str]:\n    \"\"\"Returns a new list of unique strings from 'items' in original order.\"\"\"\n    \n    # Approach 1: Using set as a lookup (Fast O(n) average time complexity)\n    seen = set()\n    result = []\n    for item in items:\n        if item not in seen:\n            seen.add(item)\n            result.append(item)\n            \n    return result\n\n# Alternatively, the Pythonic one-liner using dict order preservation (Python 3.7+)\ndef unique_fast(items: list[str]) -> list[str]:\n    # Since dicts preserve insertion order from 3.7+, we can use them to dedup and sort keys\n    seen = set()\n    return [k for k in items if not (seen.add(k) or seen.__contains__(items.index(0)))] \n\n# The most direct \"one-liner\" equivalent without complex logic:\ndef unique_simple(items: list[str]) -> List[str]:\n    # This uses the fact that 'list(set(x))' loses order. \n    # Instead, filter items against a set of seen values built incrementally.\n    return [item for item in items if not (seen := {i for i in items[:items.index(items) if item else 0]})]\n\n# Let's use the cleanest standard approach explicitly:\ndef unique_clean(items: List[str]) -> List[str]:\n    seen = set()\n    return [x for x in items if not (seen.add(x))] \n```\n\n**Wait, there is a subtle syntax error in my thought process above regarding `set` usage directly.** The one-liner `[x for x in items if not (y := {})]` doesn't work as intended because the set needs to persist. Let me provide the absolute correct and standard robust solution:\n\n```python\nfrom typing import List, Set\n\ndef unique(items: list[str]) -> list[str]:\n    \"\"\""
+    },
+    {
+      "model": "qwen3.5:4b",
+      "case_name": "coding_architecture",
+      "category": "coding",
+      "duration_seconds": 29.914,
+      "output_characters": 3174,
+      "quality_score": 62.5,
+      "passed_checks": [
+        "function",
+        "return_type",
+        "shared_context_object"
+      ],
+      "failed_checks": [
+        "duplicate_logic",
+        "order_preservation"
+      ],
+      "response": "### Problem Context: The \"Spaghetti Pipeline\"\nIn complex data pipelines (e.g., for computer vision, audio processing, or financial analysis), stages often pass numerous arguments like `file_path`, `config_flags`, `session_id`, `retry_count`, and `model_version`. As the pipeline grows, these become a tangled web of mutable state passed implicitly through function calls. This makes:\n1.  **Testing** difficult (isolating variables).\n2.  **Debugging** hard (tracking where data originated).\n3.  **Maintaining** costly to understand the flow across multiple files.\n\n### The Solution: Context Object Pattern\nWe refactor the pipeline by introducing a single, immutable `ExecutionContext` object that holds all shared state. Each stage receives this context via dependency injection rather than passing arguments explicitly. This creates a clear data lineage and encapsulates side effects within one logical unit per run.\n\n---\n\n### Code Example: Refactored Pipeline\n\nHere is a simplified example using the **Context Object Pattern**. We will simulate an AI pipeline where Stage 1 processes raw images, and Stage 2 applies custom augmentation based on metadata stored in the context.\n\n#### Step 1: Define the Shared Context\nThe `ExecutionContext` holds all arguments that need to travel between stages without being passed as function parameters. It is typically instantiated once at the entry point of the pipeline or per \"run\" (e.g., per API request).\n\n```python\nfrom dataclasses import dataclass, field\nfrom typing import Optional\nimport uuid\n\n@dataclass(frozen=True)  # Frozen ensures immutability during execution flow\nclass ExecutionContext:\n    \"\"\"Central hub for all shared state and arguments.\"\"\"\n    \n    # Identifiers & Metadata\n    session_id: str = field(default_factory=uuid.uuid4, repr=False)\n    user_request_id: Optional[str] = None\n    \n    # Data Parameters (simulating file paths or buffer references)\n    input_data_path: str = \"data/raw_video.mp4\"\n    \n    # Configuration Flags passed through the pipeline\n    use_heavy_augmentation: bool = False\n    batch_size: int = 16\n    \n    # Stateful counters (mutable within the scope of one context instance)\n    retry_attempts: int = 0\n\n# Singleton-like creation for simplicity in this demo\ncontext_holder = None \n\ndef get_context() -> ExecutionContext:\n    global context_holder\n    if context_holder is not None:\n        return context_holder\n    \n    # Initialize only once per execution flow (or reset via a factory method)\n    new_ctx = ExecutionContext(\n        session_id=uuid.uuid4(),\n        input_data_path=\"data/raw_video.mp4\", \n        use_heavy_augmentation=False,\n        batch_size=16\n    )\n    \n    # In a real app, you might inject specific configs here:\n    user_request_id = \"req_123\"\n    new_ctx.user_request_id = user_request_id\n    \n    global context_holder\n    context_holder = new_ctx\n    return new_ctx\n\n# Reset for demo purposes (normally done via shutdown/initialization)\nget_context().session_id = None # Force re-init\n```\n\n#### Step 2: Define the Pipeline Stages as Classes/Stubs\nEach stage accepts `context` and returns an updated context. We use a factory method to modify specific"
+    },
+    {
+      "model": "qwen3.5:4b",
+      "case_name": "research_comparison",
+      "category": "research",
+      "duration_seconds": 28.204,
+      "output_characters": 3138,
+      "quality_score": 100.0,
+      "passed_checks": [
+        "both_search_types",
+        "strengths",
+        "weaknesses",
+        "hybrid"
+      ],
+      "failed_checks": [],
+      "response": "In the context of building an **AI knowledge base** (often referred to as Retrieval-Augmented Generation or RAG), choosing between Vector Search, Keyword Search, or Hybrid Search depends on how your data was generated, who is searching for it, and what type of answers you need.\n\nHere is a detailed comparison of these three approaches tailored for local AI systems.\n\n---\n\n### 1. Keyword Search (Traditional/BM25)\nThis approach relies on statistical models based on term frequency/inverse document frequency (TF-IDF), similar to how Google used to rank pages before deep learning took over, or modern engines like ElasticSearch/Meilisearch with keyword analyzers. It matches search terms against exact word strings within the documents.\n\n*   **Best for:** Structured data, legal contracts, product catalogs, and precise entity matching where semantics are secondary to syntax.\n*   **Implementation Examples:** Elasticsearch (standard mode), MeiliSearch (keyword filter mode), FAISS with BM25 backends.\n\n| Strengths | Weaknesses | When to Use It |\n| :--- | :--- | :--- |\n| \u2022 **Exact Matches & Typos:** Highly effective for finding specific IDs, codes, or even if the user types a slightly wrong word due to autocomplete logic.<br>\u2022 **Performance:** Extremely fast and low latency once indexed; no heavy neural computation required during retrieval.<br>\u2022 **Privacy/Sovereignty:** Can be fully run on-device with small footprints (e.g., `nomic-embed` for embedding + local BM25).<br>\u2022 **No \"Over-Specialization\":** Unlike vectors, it doesn't collapse distinct concepts if they share few keywords. | \u2022 **Vocabulary Drift:** Fails completely if a user uses slang or synonyms that aren't in the original text.<br>\u2022 **Semantic Gap:** Cannot find related information if the terms don't match exactly (e.g., searching \"car trouble\" won't return \"engine failure\").<br>\u2022 **Spam Resistance:** Easy to game with irrelevant keywords stuffing. |\n\n### 2. Vector Search (Dense Retrieval)\nThis method converts text into high-dimensional mathematical embeddings (vectors) using neural networks. The retrieval process involves calculating the cosine similarity between a user's query vector and document vectors in a database like FAISS, Milvus, or Qdrant.\n\n*   **Best for:** Unstructured data, summarization tasks, answering open-ended questions, and scenarios requiring semantic understanding (e.g., \"What are my recent health issues?\" vs. the exact phrase).\n*   **Implementation Examples:** Pinecone (API-based), FAISS/Milvus/Qdrant + local LLM embedding models (Mistral-Nemo-Embedding-Lite is excellent for this on small devices).\n\n| Strengths | Weaknesses | When to Use It |\n| :--- | :--- | :--- |\n| \u2022 **Semantic Understanding:** Finds meaning, not just words. Can answer questions using synonyms or paraphrases.<br>\u2022 **Complex Queries:** Handles multi-step queries and complex logical relationships better than keyword search alone.<br>\u2022 **Contextual Retrieval:** Excels at finding relevant *chunks* of text for local LLM prompting rather than whole document matches.<br>\u2022 **Scalability:** Excellent at handling millions of documents where exact string"
+    },
+    {
+      "model": "qwen3.5:4b",
+      "case_name": "research_synthesis",
+      "category": "research",
+      "duration_seconds": 28.534,
+      "output_characters": 3326,
+      "quality_score": 66.7,
+      "passed_checks": [
+        "both_search_types",
+        "hybrid"
+      ],
+      "failed_checks": [
+        "strengths",
+        "weaknesses"
+      ],
+      "response": "The issue you're facing is a classic challenge in information retrieval known as the **precision vs. recall trade-off**, specifically exacerbated by \"semantic noise.\" The system retrieves documents based on *similarity* (do they talk about the same topic?) rather than *utility* (is this note actually helpful for my specific task?).\n\nHere are three distinct methods to improve retrieval quality, followed by a strategy for combining them.\n\n### 1. Hybrid Retrieval (Keyword + Vector Search)\nCurrent systems often rely entirely on dense vector embeddings, which excel at capturing semantic meaning but struggle with exact phrasing or critical entities like dates, names, and technical parameters.\n\n*   **How it works:** Instead of querying the database solely with a single text embedding, you run two parallel queries:\n    1.  **Dense Vector Search:** Finds notes semantically similar to your query conceptually (e.g., \"how to fix leak\" matches \"pressure gauge shows low water\").\n    2.  **Keyword/Sparsity Search (BM25):** Finds notes containing exact keywords, specific numbers, or proper nouns mentioned in the note metadata.\n*   **Why it helps:** This reduces false positives where a note talks about a similar topic but lacks the specific actionable detail you need. It anchors the semantic retrieval in factual precision.\n\n### 2. Re-ranking with Cross-Encoders\nTop-K vector search often returns results that are \"relevant enough\" to rank near the top, rather than being perfectly useful. A simple linear model (like a BERT encoder) used for initial retrieval is too fast but lacks deep contextual understanding.\n\n*   **How it works:** After retrieving 10\u201350 candidates using vector similarity or keyword search, you pass those specific document-query pairs through a more sophisticated **Cross-Encoder** model.\n    *   A Cross-Encoders processes the query and the candidate note together to generate an attention-based score that measures how well they fit as a pair (e.g., \"Does this specific tip actually apply to my 2018 Toyota?\" vs. \"This is about cars in general\").\n*   **Why it helps:** This acts as a filter, discarding semantically similar notes that are irrelevant because their content doesn't logically support the user's implicit question or constraints.\n\n### 3. Contextual Filtering & Metadata Scoring\nSemantic similarity ignores *context*, which is crucial for practical utility. A note about \"fixing a server\" might be useless if it was written from an office setting while you are troubleshooting on-site, even if the semantic topics match perfectly.\n\n*   **How it works:** Augment retrieval with explicit metadata filtering or a dedicated scoring function that weighs context signals:\n    *   **Time Decay/Recency:** Automatically down-weight older notes unless they have \"pinned\" utility (e.g., historical configuration data).\n    *   **Scenario Matching:** Filter by environment tags (`#on-site`, `#cloud`, `#legacy-system`) before returning results.\n    *   **Actionability Scores:** If possible, use a classifier to score the note on whether it contains step-by-step instructions rather than just observations or anecdotes.\n*   **Why it helps:** This ensures that even if two notes are 95% semantically similar and both old/off-topic, they won't appear together in your results; one will be filtered"
+    },
+    {
+      "model": "qwen3.5:4b",
+      "case_name": "research_uncertainty",
+      "category": "research",
+      "duration_seconds": 29.379,
+      "output_characters": 3388,
+      "quality_score": 62.5,
+      "passed_checks": [
+        "strengths",
+        "hybrid",
+        "limited_evidence"
+      ],
+      "failed_checks": [
+        "both_search_types",
+        "weaknesses"
+      ],
+      "response": "When faced with conflicting benchmarks where **Model A excels generally** but **Model B dominates a critical specific use case**, the key to making a robust decision is moving beyond aggregate metrics (like average latency or standard accuracy scores) toward an analysis of **risk, cost-benefit trade-offs, and business context**. Relying on limited evidence means accepting that \"faster overall\" might be misleading if Model A's speed advantage comes from consistently under-delivering in the edge cases where Model B shines.\n\nHere is a structured approach to evaluating which model should enter production without overclaiming:\n\n### 1. Quantify the Specific Task Impact\nInstead of treating the code task as an isolated event, quantify its business value relative to the \"general\" performance gain.\n*   **Define Success Criteria:** Does failing this specific coding task result in financial loss, security vulnerabilities, or brand damage? If yes, that weight significantly outweighs a 10-20% global latency reduction offered by Model A.\n*   **Calculate Weighted Scores:** Assign weights to different categories of tasks based on business importance rather than just equal weighting across all benchmarks.\n    *   *Formula (Conceptual):* $Total\\_Score = (Weight_{General} \\times Perf_A) + (Weight_{CriticalTask} \\times Perf_B)$\n    *   If the critical task has high stakes, Model B's superior performance there may render its occasional slowness or minor errors on non-critical tasks acceptable.\n\n### 2. Conduct Scenario-Based Stress Testing (Red Teaming)\nLimited benchmark evidence often presents \"best-case\" scenarios for both models. You need to see how they behave under pressure and error conditions.\n*   **Adversarial Inputs:** Feed Model B the edge cases that cause it to lag or hallucinate, but also feed Model A inputs where its general speed hides subtle reasoning errors in complex code generation.\n*   **Regression Testing History:** Run the specific coding task against historical production logs from both models (if available) during their training phases or previous iterations. Did they consistently handle error messages correctly? How do they recover when a syntax is ambiguous?\n\n### 3. Analyze Latency Variance vs. Mean Performance\n\"Model A is faster overall\" usually refers to mean latency, but production environments care about **tail latency** (P95/P99).\n*   Check the distribution of response times for Model B on the critical coding task: Is it consistently fast enough within a tight deadline window? Or does it have high variance where responses sometimes exceed time limits?\n*   If Model A is faster 90% of the time but fails completely during complex compilation tasks (causing timeouts), its \"average speed\" metric becomes a red flag for production reliability.\n\n### 4. Evaluate the Cost-Tradeoff Framework\nIn many scenarios, using Model B isn't about switching entirely; it's about optimizing architecture. You can avoid overclaiming by proposing an **hybrid approach**:\n*   **Default to A:** Use Model A as the default general-purpose model for quick queries and low-risk code snippets due to its aggregate speed.\n*   **Fallback/On-Call B:** Implement a routing mechanism where, when specific keywords (e.g., \"debug,\" \"security patch,\" \"complex algorithm\") are detected or a user explicitly requests high-confidence output, the request is routed to Model"
+    },
+    {
+      "model": "qwen3.5:4b",
+      "case_name": "reasoning_bottleneck",
+      "category": "reasoning",
+      "duration_seconds": 25.482,
+      "output_characters": 2417,
+      "quality_score": 71.4,
+      "passed_checks": [
+        "identify_bottleneck",
+        "generation_stage",
+        "correct_optimization_target"
+      ],
+      "failed_checks": [
+        "uses_both_timings"
+      ],
+      "response": "Based on the data provided:\n*   Planning: **0.5 s** (1%)\n*   Retrieval: **0.7 s** (2%*) *Note: Assuming \"retrieval\" here refers to the total time for all retrieval tasks combined or a specific heavy phase.* -> Let's re-calculate precisely based on single items if they were separate, but looking at your numbers, let's assume these are sequential steps summing up to the non-generative parts.\n\nWait, there is likely a typo in my initial quick scan of the percentages above because 0.5 + 0.7 + 0.2 = **1.4 seconds**. Compared to **75 seconds**, this difference is massive. Let's do the exact math:\n*   Total non-generation time: $0.5 + 0.7 + 0.2 = \\mathbf{1.4\\text{ s}}$.\n*   Generation time: $\\mathbf{75\\text{ s}}$.\n\n### Main Bottleneck Identified\nThe **Model Generation** phase is overwhelmingly the main bottleneck, consuming roughly **98%** (specifically $1 - \\frac{0.6}{75+0.6} \\approx 99.2\\%$) of the total request time ($74.5/75.5$s).\n\n### What Should Be Optimized First?\nYou should prioritize optimizing **Model Generation** before touching planning, retrieval, or context building for any meaningful impact on overall speed.\n\nHere is why:\n1.  **Magnitude of Impact**: Reducing the generation time by just a few seconds will save more than half an hour total (e.g., saving $5\\text{s}$ saves you roughly $\\frac{74}{69} \\approx 30\\times$ that amount in parallel requests). Conversely, optimizing retrieval might shave off milliseconds across millions of calls, which adds up to only minutes or hours globally.\n2.  **Sequential Dependency**: In most LLM pipelines for specific tasks (like coding assistants), the model is waiting on data *after* planning/retrieval regardless of how fast that was; you cannot generate output until it finishes building context and generating tokens sequentially at $T_{gen}$.\n\n**Strategic Recommendation:**\nFocus your engineering resources here by:\n*   **Model Selection**: Switching from a heavy reasoning model (like o1 or similar) to a faster, dense inference engine if the task allows.\n*   **Context Streaming/Shortening**: Implementing early token streaming so users see results as soon as possible after generation starts.\n*   **Caching**: Heavily caching frequent queries before they even hit the model's context window setup phase (though this technically happens *before* generation, if a specific prompt is repeated 10x/second, optimization here yields instant savings)."
+    },
+    {
+      "model": "qwen3.5:4b",
+      "case_name": "reasoning_constraints",
+      "category": "reasoning",
+      "duration_seconds": 30.03,
+      "output_characters": 3064,
+      "quality_score": 40.0,
+      "passed_checks": [
+        "generation_stage",
+        "memory_headroom",
+        "smaller_default"
+      ],
+      "failed_checks": [
+        "identify_bottleneck",
+        "uses_both_timings",
+        "correct_optimization_target"
+      ],
+      "response": "To determine the safest default setting, we must first calculate your available headroom after accounting for system overhead (Docker). With **24 GB** of total memory and a typical Docker footprint of **5 GB**, you have:\n\n$$ 24 \\text{ GB} - 5 \\text{ GB} = 19 \\text{ GB} $$\n\nThis means your available context for the AI models is roughly **19 GB**. Here is the breakdown by model against this limit, followed by safety and usage recommendations.\n\n### Resource Analysis\n\n**Model A (6 GB)**\n*   Model Size: ~6 GB\n*   Docker Overhead: 5 GB\n*   Remaining Headroom for Context/Cache: $19 - 6 = \\mathbf{13 \\text{ GB}}$\n*   **Safety Factor:** Extremely High. Even with large conversation histories (high context window) or running multiple concurrent instances, you will not exceed your physical limits without memory swapping (which causes freezing).\n\n**Model B (14 GB)**\n*   Model Size: ~14 GB\n*   Docker Overhead: 5 GB\n*   Remaining Headroom for Context/Cache: $19 - 14 = \\mathbf{5 \\text{ GB}}$\n*   **Safety Factor:** Low. This leaves very little room for a long conversation history or any overhead spikes (e.g., garbage collection pauses). If the user asks to generate text over many thousands of tokens, you risk running out of RAM and triggering OOM kills on Docker, which will crash your session abruptly rather than degrading gracefully.\n\n---\n\n### Recommendation: Which is safer as the default?\n\n**Model A is strictly safer.**\n\nRunning Model B by default introduces a significant risk of system instability due to limited context headroom. AI generation depends heavily not just on inference memory (model weights) but also on **KV Cache Memory**, which stores the history of your conversation so far.\n*   With 14 GB used up, you have only ~5 GB left for context. If a chat becomes long or complex, that cache will fill the remaining space instantly, causing an out-of-memory error.\n*   Model A consumes negligible overhead compared to the total budget (6/23 \u2248 26%), whereas Model B creates fragility where almost all available resources are locked into static weights with little room for runtime fluctuation.\n\n### When might you choose Model B?\n\nYou should opt for **Model B** only under specific, controlled conditions:\n\n1.  **Known Short Contexts:** You know the input will be very short (e.g., analyzing a single document or writing a quick code snippet) and do not anticipate needing more than ~5 GB of cache memory.\n2.  **\"Kill Switch\" Configuration:** Your Docker setup is configured to automatically restart containers upon failure, meaning if Model B crashes due to an OOM error, the downtime only lasts seconds rather than minutes while trying to swap memory or debug a frozen process (which happens with Model A's high risk of swapping).\n3.  **Precision-Critical Tasks with Controlled Inputs:** If you are running specific technical tasks where accuracy is paramount and can guarantee strict input length limits.\n\n**Strategic Compromise:**\nIf your priority shifts between long, creative conversations and deep analysis: use **Model A as the default**."
+    },
+    {
+      "model": "qwen3.5:4b",
+      "case_name": "reasoning_tradeoff",
+      "category": "reasoning",
+      "duration_seconds": 30.99,
+      "output_characters": 3365,
+      "quality_score": 33.3,
+      "passed_checks": [
+        "generation_stage",
+        "role_specific_choice"
+      ],
+      "failed_checks": [
+        "identify_bottleneck",
+        "uses_both_timings",
+        "correct_optimization_target"
+      ],
+      "response": "Choosing between these two models depends entirely on the **trade-off between speed/throughput** (the smaller model) versus **complexity handling/hallucination risk** (the larger model). The decision matrix shifts based on whether the task requires iterative refinement, precise fact-checking, or real-time execution.\n\nHere is how I would approach selecting between them for specific workloads:\n\n### 1. Coding Workload\nIn software development, this is often a **hybrid pipeline** rather than an all-or-nothing choice. The smaller model excels at speed and boilerplate generation, while the larger model is superior in logic verification and architecture design.\n\n*   **For Boilerplate & Syntax (Small Model):** Use for generating standard functions, unit test skeletons, or fixing obvious syntax errors where a 90% score is sufficient to prevent runtime failures.\n    *   *Strategy:* \"Generate code fast using the small model; then run automated tests immediately.\" If the LLM fails validation, rerun with the large model only on that specific module.\n*   **For Architecture & Logic (Large Model):** Reserve for complex algorithms, system design documents, refactoring legacy spaghetti code, or debugging edge cases where logic errors could lead to security vulnerabilities or data loss. The extra 30 seconds per request is an investment in correctness.\n    *   *Strategy:* \"Prompt the large model with a 'Chain of Thought' constraint to derive the solution first before generating any code blocks.\"\n\n**Decision Rule:** If the coding task can be validated by unit tests, use the **smaller model for iteration**. If it requires complex logical deduction or architectural judgment that cannot be easily tested, switch to the **larger model**.\n\n### 2. Planning Workload\nPlanning involves defining a roadmap of tasks, estimating timelines, and identifying potential risks early in the process. Here, efficiency is key because planning errors compound over time; however, hallucinating constraints can delay projects longer than they would finish quickly anyway.\n\n*   **For Quick Prototyping & Iterative Sprints:** The small model's 20-second turnaround allows for rapid \"what-if\" scenarios and frequent pivots without the wait-time penalty of human intervention or large inference costs.\n    *   *Risk:* It might miss long-term dependency conflicts due to limited context reasoning depth (95% vs 100%).\n*   **For Strategic Roadmaps:** The larger model's higher quality ensures a more holistic view, identifying subtle constraints in regulations, third-party APIs, or resource availability that the smaller model would overlook.\n\n**Decision Rule:**\n*   Use the **smaller model** for day-to-day sprint planning and tactical tasks (e.g., \"Create a GitHub workflow file\").\n*   Use the **larger model** only once at the very beginning to establish high-level goals, resource allocation strategies, or critical dependency mapping.\n\n### 3. Deep Research Workloads\nResearch demands accuracy, citation fidelity, and synthesis of diverse information sources. The gap between \"90% quality\" and \"100%\" in this context usually represents a difference between *plausible* answers and *factually accurate*, cited answers.\n\n*   **The Risk of the Small Model:** At 20 seconds with 90% accuracy, there is a non-zero risk (5x higher than the large model) that it will hallucinate sources,"
+    }
+  ]
+}
