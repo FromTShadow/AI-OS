@@ -5,6 +5,8 @@ Execution runner for AI-OS Model Benchmark V3.
 from dataclasses import dataclass
 from time import perf_counter
 from typing import List
+from urllib import response
+from brain.benchmarks.code_evaluator_v3 import CodeEvaluatorV3
 
 from brain.benchmarks.model_benchmark_v3 import (
     BenchmarkCaseV3,
@@ -12,6 +14,9 @@ from brain.benchmarks.model_benchmark_v3 import (
 )
 from brain.benchmarks.quality_v3 import QualityEvaluatorV3
 from brain.models.ollama import OllamaClient
+from brain.benchmarks.debug_code_evaluator_v3 import (
+    DebugCodeEvaluatorV3,
+)
 
 
 @dataclass
@@ -32,6 +37,8 @@ class ModelBenchmarkRunnerV3:
         self.ollama = OllamaClient()
         self.case_provider = BenchmarkCasesV3()
         self.quality = QualityEvaluatorV3()
+        self.code_quality = CodeEvaluatorV3()
+        self.debug_code_quality = DebugCodeEvaluatorV3()
 
     def run_case(
         self,
@@ -42,14 +49,25 @@ class ModelBenchmarkRunnerV3:
         response = self.ollama.chat(
             case.prompt,
             model=self.model,
+            temperature=0.0,
+            seed=42,
         )
 
         duration = perf_counter() - started_at
 
-        quality = self.quality.evaluate(
-            case_name=case.name,
-            response=response,
-        )
+        if case.name == "coding_normalize_scores_debug":
+            quality = self.debug_code_quality.evaluate(
+        response
+    )
+        elif case.category == "coding":
+            quality = self.code_quality.evaluate(
+        response
+    )
+        else:
+            quality = self.quality.evaluate(
+                case_name=case.name,
+                response=response,
+    )
 
         return BenchmarkResultV3(
             model=self.model,

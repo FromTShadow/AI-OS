@@ -53,7 +53,20 @@ class OllamaClient:
         think: bool = False,
         max_tokens: int = 700,
         timeout: int = 180,
+        temperature: float | None = None,
+        seed: int | None = None,
     ) -> str:
+        options = {
+            "num_predict": max_tokens,
+            "num_ctx": 4096,
+        }
+
+        if temperature is not None:
+            options["temperature"] = temperature
+
+        if seed is not None:
+            options["seed"] = seed
+
         response = requests.post(
             f"{self.base_url}/api/generate",
             json={
@@ -61,13 +74,11 @@ class OllamaClient:
                 "prompt": prompt,
                 "stream": False,
                 "think": think,
-                "options": {
-                    "num_predict": max_tokens,
-                    "num_ctx": 4096,
-                },
+                "options": options,
             },
             timeout=timeout,
         )
+
         response.raise_for_status()
 
         return response.json()["response"]

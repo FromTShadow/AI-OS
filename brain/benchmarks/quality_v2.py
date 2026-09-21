@@ -258,21 +258,6 @@ class QualityEvaluatorV2:
             "reasoning_tradeoff": "reasoning",
         }
 
-        self.case_categories = {
-            "planning_priorities": "planning",
-            "planning_conflict": "planning",
-            "planning_architecture": "planning",
-            "coding_implementation": "coding",
-            "coding_debugging": "coding",
-            "coding_architecture": "coding",
-            "research_comparison": "research",
-            "research_synthesis": "research",
-            "research_uncertainty": "research",
-            "reasoning_bottleneck": "reasoning",
-            "reasoning_constraints": "reasoning",
-            "reasoning_tradeoff": "reasoning",
-        }
-
     def check_passes(
         self,
         check: QualityCheck,
