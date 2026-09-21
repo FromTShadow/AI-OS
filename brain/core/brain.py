@@ -1,122 +1,105 @@
 """
-AI Brain response engine.
-Combines planning, memory retrieval, Ollama generation, and source tracking.
+Compatibility interface for the AI-OS execution pipeline.
+
+AIBrain preserves the original answer() interface while delegating all
+planning, routing, state loading, memory handling, prompt construction,
+and model execution to ExecutionPipeline.
 """
 
-from brain.memory.search import MemorySearch
-from brain.models.ollama import OllamaClient
-from brain.planner.planner import Planner
+from brain.execution.pipeline import ExecutionPipeline
+from brain.execution.task import Task
 
 
 class AIBrain:
-    def __init__(self):
-        self.memory = MemorySearch()
-        self.ollama = OllamaClient()
-        self.planner = Planner()
+    def __init__(
+        self,
+        pipeline: ExecutionPipeline | None = None,
+    ):
+        self.pipeline = pipeline or ExecutionPipeline()
 
-    def retrieve_memory(self, query: str, limit: int = 5):
-        return self.memory.search(query, limit=limit)
-
-    def build_context(self, results) -> str:
-        if not results:
-            return "No relevant memory found."
-
-        context_blocks = []
-
-        for i, result in enumerate(results, start=1):
-            title = result.payload.get("title", "Untitled")
-            folder = result.payload.get("folder", "Unknown")
-            chunk_index = result.payload.get("chunk_index", 0)
-            content = result.payload.get("content", "")
-
-            context_blocks.append(
-                f"[Memory {i}]\n"
-                f"Title: {title}\n"
-                f"Folder: {folder}\n"
-                f"Chunk: {chunk_index}\n"
-                f"Content:\n{content}"
-            )
-
-        return "\n\n---\n\n".join(context_blocks)
-
-    def format_plan(self, plan: dict) -> str:
-        needs = plan["needs"]
-
-        active_roles = [
-            role for role, needed in needs.items()
-            if needed and role != "memory"
-        ]
-
-        if not active_roles:
-            active_roles = ["ceo"]
-
-        return (
-            f"Primary role: {plan['primary_role']}\n"
-            f"Specialists needed: {', '.join(active_roles)}\n"
-            f"Memory needed: {needs.get('memory', False)}"
+    def execute(
+        self,
+        query: str,
+        memory_limit: int = 5,
+    ) -> Task:
+        return self.pipeline.execute(
+            query,
+            memory_limit=memory_limit,
         )
 
-    def format_sources(self, results) -> str:
-        if not results:
+    def format_plan(self, task: Task) -> str:
+        specialists = ", ".join(task.specialists) or (
+            task.primary_role or "general"
+        )
+        needs_memory = task.plan.get("needs", {}).get(
+            "memory",
+            True,
+        )
+
+        return (
+            f"Primary role: {task.primary_role or 'general'}\n"
+            f"Specialists needed: {specialists}\n"
+            f"Memory needed: {needs_memory}"
+        )
+
+    def format_state(self, task: Task) -> str:
+        state = task.current_state
+
+        return (
+            f"Version: {state.get('version', 'unknown')}\n"
+            f"Current focus: "
+            f"{state.get('current_focus', 'unknown')}\n"
+            f"Next focus: {state.get('next_focus', 'unknown')}"
+        )
+
+    def format_sources(self, task: Task) -> str:
+        if not task.memory_results:
             return "No memory sources used."
 
         lines = []
 
-        for i, result in enumerate(results, start=1):
-            title = result.payload.get("title", "Untitled")
-            folder = result.payload.get("folder", "Unknown")
+        for index, result in enumerate(
+            task.memory_results,
+            start=1,
+        ):
+            payload = result.payload or {}
+            title = payload.get("title", "Untitled")
+            folder = payload.get("folder", "Unknown")
+            chunk_index = payload.get("chunk_index", 0)
             score = round(result.score, 3)
-            chunk_index = result.payload.get("chunk_index", 0)
-            confidence = self.memory.confidence_label(result.score)
 
             lines.append(
-                f"{i}. {title} | "
+                f"{index}. {title} | "
                 f"folder: {folder} | "
                 f"chunk: {chunk_index} | "
-                f"score: {score} | "
-                f"confidence: {confidence}"
+                f"score: {score}"
             )
 
         return "\n".join(lines)
 
-    def answer(self, query: str) -> str:
-        plan = self.planner.classify(query)
-        results = self.retrieve_memory(query)
-        context = self.build_context(results)
-        plan_report = self.format_plan(plan)
-
-        prompt = f"""
-You are the AI Brain for Nejc's local AI Operating System.
-
-You have created this execution plan:
-
-{plan_report}
-
-Use the memory context below to answer the user's question.
-Adapt your answer to the primary role:
-- developer: practical technical implementation
-- research: structured research and comparison
-- second_brain: organization, notes, knowledge management
-- trading: systematic trading, testing, risk management
-- ceo: priorities, roadmap, ROI, decision-making
-
-If the context is not enough, say what is missing.
-
-Memory Context:
-{context}
-
-User Question:
-{query}
-
-Answer clearly and practically.
-"""
-
-        answer = self.ollama.chat(prompt)
-        sources = self.format_sources(results)
-
+    def format_response(self, task: Task) -> str:
         return (
-            f"{answer}\n\n"
+            f"{task.answer}\n\n"
             f"---\n"
-            f"Brain plan:\n{plan_report}\n\n"
-            f"Memory sources used:\n{sources}"
+            f"Brain plan:\n{self.format_plan(task)}\n\n"
+            f"Authoritative state:\n{self.format_state(task)}\n\n"
+            f"Memory sources used:\n{self.format_sources(task)}"
         )
+
+    def answer(
+        self,
+        query: str,
+        memory_limit: int = 5,
+    ) -> str:
+        task = self.execute(
+            query,
+            memory_limit=memory_limit,
+        )
+
+        if task.errors:
+            details = "; ".join(task.errors)
+            raise RuntimeError(
+                f"AI Brain pipeline failed: {details}"
+            )
+
+        return self.format_response(task)
