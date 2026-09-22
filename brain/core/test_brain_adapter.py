@@ -33,9 +33,9 @@ class FakePipeline:
             }
         }
         task.current_state = {
-            "version": "0.3.4-dev",
-            "current_focus": "Pipeline testing and observability",
-            "next_focus": "LLM Planner preparation",
+            "version": "0.3.5-dev",
+            "current_focus": "LLM Planner preparation",
+            "next_focus": "LLM Planner prototype",
         }
         task.primary_role = "research"
         task.specialists = ["research"]
@@ -60,9 +60,9 @@ assert pipeline.calls == [
 
 assert "Adapter response." in response
 assert "Primary role: research" in response
-assert "Version: 0.3.4-dev" in response
-assert "Pipeline testing and observability" in response
+assert "Version: 0.3.5-dev" in response
 assert "LLM Planner preparation" in response
+assert "LLM Planner prototype" in response
 assert "No memory sources used." in response
 
 print("AIBrain pipeline adapter test passed.")

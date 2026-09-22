@@ -14,8 +14,8 @@ assert state["modules"]["memory_ranker"] == "complete"
 assert state["modules"]["memory_compressor"] == "complete"
 assert state["modules"]["context_builder"] == "complete"
 
-assert state["current_focus"] == "Pipeline testing and observability"
-assert state["next_focus"] == "LLM Planner preparation"
+assert state["current_focus"] == "LLM Planner preparation"
+assert state["next_focus"] == "LLM Planner prototype"
 
 assert "Current focus:" in context
 assert "Next focus:" in context

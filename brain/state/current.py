@@ -10,9 +10,8 @@ It should always describe reality, not historical notes.
 CURRENT_STATE = {
     "project": "AI-OS",
 
-    "version": "0.3.4-dev",
+    "version": "0.3.5-dev",
 
-    "git_commit": "1db052a",
 
     "modules": {
         "memory_ranker": "complete",
@@ -24,6 +23,7 @@ CURRENT_STATE = {
         "prompt_loader": "complete",
         "router": "complete",
         "state_provider": "complete",
+        "model_benchmark_v3": "complete",
         "llm_planner": "planned",
         "multi_agent": "planned",
     },
@@ -36,6 +36,6 @@ CURRENT_STATE = {
         "open_webui": True,
     },
 
-    "current_focus": "Pipeline testing and observability",
-    "next_focus": "LLM Planner preparation",
+    "current_focus": "LLM Planner preparation",
+    "next_focus": "LLM Planner prototype",
 }
