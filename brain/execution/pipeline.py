@@ -31,14 +31,18 @@ from brain.execution.task import Task
 from brain.memory.ranking import MemoryRanker
 from brain.memory.search import MemorySearch
 from brain.models.ollama import OllamaClient
-from brain.planner.planner import Planner
+from brain.planner.factory import create_planner
 from brain.router.router import SpecialistRouter
 
 
 class ExecutionPipeline:
-    def __init__(self):
+    def __init__(self, planner=None):
         self.state = StateProvider()
-        self.planner = Planner()
+        self.planner = (
+            planner
+            if planner is not None
+            else create_planner()
+        )
         self.router = SpecialistRouter()
         self.memory = MemorySearch()
         self.memory_ranker = MemoryRanker()
@@ -55,6 +59,27 @@ class ExecutionPipeline:
 
     def run_planning(self, task: Task) -> Task:
         task.plan = self.planner.classify(task.query)
+
+        task.metadata["planner"] = {
+            "implementation": type(self.planner).__name__,
+            "planner_type": task.plan.get(
+                "planner_type",
+                "deterministic",
+            ),
+            "model": getattr(
+                self.planner,
+                "model",
+                None,
+            ),
+            "attempts": task.plan.get(
+                "planner_attempts",
+                1,
+            ),
+            "fallback_reason": task.plan.get(
+                "fallback_reason",
+            ),
+        }
+
         return task
 
     def run_routing(self, task: Task) -> Task:
