@@ -154,14 +154,65 @@ class ExecutionPipeline:
 
         return task
 
+    def format_plan_list(self, items) -> str:
+        if not isinstance(items, list) or not items:
+            return "- None provided."
+
+        return "\n".join(
+            f"{index}. {item}"
+            for index, item in enumerate(
+                items,
+                start=1,
+            )
+        )
+
+    def format_execution_plan(self, task: Task) -> str:
+        plan = task.plan or {}
+
+        goal = plan.get("goal") or task.query
+        steps = self.format_plan_list(
+            plan.get("steps")
+        )
+        risks = self.format_plan_list(
+            plan.get("risks")
+        )
+        success_criteria = self.format_plan_list(
+            plan.get("success_criteria")
+        )
+
+        return f"""
+Goal:
+{goal}
+
+Planned steps:
+{steps}
+
+Known risks:
+{risks}
+
+Success criteria:
+{success_criteria}
+""".strip()
+
     def build_prompt(self, task: Task) -> Task:
         if task.system_prompt is None:
-            raise RuntimeError("System prompt was not loaded by the Router.")
+            raise RuntimeError(
+                "System prompt was not loaded by the Router."
+            )
 
         if task.specialist_prompt is None:
-            raise RuntimeError("Specialist prompt was not loaded by the Router.")
+            raise RuntimeError(
+                "Specialist prompt was not loaded by the Router."
+            )
 
-        specialists = ", ".join(task.specialists) or task.primary_role or "general"
+        specialists = (
+            ", ".join(task.specialists)
+            or task.primary_role
+            or "general"
+        )
+        execution_plan = self.format_execution_plan(
+            task
+        )
 
         task.prompt = f"""
 {task.system_prompt.content}
@@ -170,7 +221,7 @@ class ExecutionPipeline:
 
 {task.specialist_prompt.content}
 
-## Execution Plan
+## Routing
 
 - Primary role: {task.primary_role}
 - Specialists involved: {specialists}
@@ -180,16 +231,24 @@ class ExecutionPipeline:
 The following information describes the latest known implementation state
 of AI-OS. Treat it as the source of truth.
 
-If retrieved memory conflicts with this state, always follow the current
-project state.
+If retrieved memory or the structured execution plan conflicts with this
+state, always follow the current project state.
 
 {task.state_context}
+
+## Structured Execution Plan
+
+The plan below is execution guidance. Check it against the authoritative
+current state above. Revise or skip any step that is already complete,
+outdated, unsafe, or unnecessary.
+
+{execution_plan}
 
 ## Historical Project Memory
 
 The following retrieved notes provide supporting and historical context.
-They may contain older plans, completed tasks, or outdated project status.
 
+They may contain older plans, completed tasks, or outdated project status.
 Use this memory for relevant details, but never allow it to override the
 authoritative current project state above.
 
