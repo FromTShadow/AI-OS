@@ -33,6 +33,20 @@ CHAT_MODEL = "qwen3:14b"
 
 EMBED_MODEL = "nomic-embed-text"
 
+OLLAMA_CONTEXT_WINDOW = 4096
+DEFAULT_CHAT_MAX_TOKENS = 700
+DEFAULT_CHAT_TIMEOUT_SECONDS = 180
+PIPELINE_CHAT_TIMEOUT_SECONDS = 300
+
+ROLE_MAX_TOKENS = {
+    "research": 1400,
+    "developer": 1200,
+    "trading": 1200,
+    "second_brain": 1000,
+    "ceo": 900,
+    "general": 900,
+}
+
 # ======================================================
 # QDRANT
 # ======================================================

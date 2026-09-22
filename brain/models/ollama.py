@@ -5,12 +5,24 @@ Handles chat models and embedding models.
 
 import requests
 
-from brain.config.settings import OLLAMA_URL, CHAT_MODEL, EMBED_MODEL
+from brain.config.settings import (
+    CHAT_MODEL,
+    DEFAULT_CHAT_MAX_TOKENS,
+    DEFAULT_CHAT_TIMEOUT_SECONDS,
+    EMBED_MODEL,
+    OLLAMA_CONTEXT_WINDOW,
+    OLLAMA_URL,
+)
 
 
 class OllamaClient:
-    def __init__(self, base_url: str = OLLAMA_URL):
+    def __init__(
+        self,
+        base_url: str = OLLAMA_URL,
+        default_model: str = CHAT_MODEL,
+):
         self.base_url = base_url.rstrip("/")
+        self.default_model = default_model
 
     def health(self) -> bool:
         try:
@@ -48,17 +60,17 @@ class OllamaClient:
     def chat(
         self,
         prompt: str,
-        model: str = CHAT_MODEL,
+        model: str | None = None,
         *,
         think: bool = False,
-        max_tokens: int = 700,
-        timeout: int = 180,
+        max_tokens: int = DEFAULT_CHAT_MAX_TOKENS,
+        timeout: int = DEFAULT_CHAT_TIMEOUT_SECONDS,
         temperature: float | None = None,
         seed: int | None = None,
     ) -> str:
         options = {
             "num_predict": max_tokens,
-            "num_ctx": 4096,
+            "num_ctx": OLLAMA_CONTEXT_WINDOW,
         }
 
         if temperature is not None:
@@ -70,7 +82,7 @@ class OllamaClient:
         response = requests.post(
             f"{self.base_url}/api/generate",
             json={
-                "model": model,
+                "model": model or self.default_model,
                 "prompt": prompt,
                 "stream": False,
                 "think": think,

@@ -19,6 +19,12 @@ Future stages will add:
 from time import perf_counter
 from typing import Any, List
 
+from brain.config.settings import (
+    DEFAULT_CHAT_MAX_TOKENS,
+    PIPELINE_CHAT_TIMEOUT_SECONDS,
+    ROLE_MAX_TOKENS,
+)
+
 from brain.state.provider import StateProvider
 from brain.memory.compression import MemoryCompressor
 from brain.execution.task import Task
@@ -174,8 +180,34 @@ state. Do not recommend work already marked as complete.
 
         return task
 
+    def model_max_tokens(self, task: Task) -> int:
+        role = task.primary_role or "general"
+
+        general_limit = ROLE_MAX_TOKENS.get(
+            "general",
+            DEFAULT_CHAT_MAX_TOKENS,
+        )
+
+        return ROLE_MAX_TOKENS.get(
+            role,
+            general_limit,
+        )
+
     def run_model(self, task: Task) -> Task:
-        task.answer = self.ollama.chat(task.prompt)
+        max_tokens = self.model_max_tokens(task)
+
+        task.metadata["model_generation"] = {
+            "model": self.ollama.default_model,
+            "max_tokens": max_tokens,
+            "timeout_seconds": PIPELINE_CHAT_TIMEOUT_SECONDS,
+        }
+
+        task.answer = self.ollama.chat(
+            task.prompt,
+            max_tokens=max_tokens,
+            timeout=PIPELINE_CHAT_TIMEOUT_SECONDS,
+        )
+
         return task
 
     def run_timed_stage(
