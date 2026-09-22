@@ -119,6 +119,14 @@ def test_retry_succeeds():
     assert result["fallback_reason"] is None
     assert len(client.calls) == 2
 
+    first_prompt = client.calls[0]["prompt"]
+    second_prompt = client.calls[1]["prompt"]
+
+    assert first_prompt != second_prompt
+    assert "Your previous response was rejected" in second_prompt
+    assert "PlanValidationError" in second_prompt
+    assert "not valid JSON" in second_prompt
+
 
 def test_both_attempts_fail():
     client = FakeOllamaClient(
@@ -228,6 +236,54 @@ def test_deterministic_guardrails_preserve_explicit_roles():
     assert "research" in result["guardrail_roles"]
     assert "developer" in result["guardrail_roles"]
 
+def test_ce_alias_is_normalized_to_ceo():
+    response = valid_plan(
+        needs={
+            "memory": True,
+            "developer": False,
+            "research": False,
+            "second_brain": False,
+            "trading": False,
+            "ceo": False,
+        },
+        primary_role="ce",
+        goal="Identify the next project milestone.",
+        steps=[
+            "Review the current project state.",
+            "Select the next incomplete milestone.",
+        ],
+        risks=[
+            "Historical memory may contain outdated status.",
+        ],
+        success_criteria=[
+            "The next milestone is identified.",
+        ],
+    )
+
+    client = FakeOllamaClient(
+        [json.dumps(response)]
+    )
+    planner = LLMPlanner(
+        ollama=client,
+        max_attempts=2,
+    )
+
+    result = planner.classify(
+        "What should I prioritize next?"
+    )
+
+    assert result["planner_type"] == "llm"
+    assert result["planner_attempts"] == 1
+    assert result["primary_role"] == "ceo"
+    assert result["needs"]["ceo"] is True
+    assert result["primary_role_needs_correction"] is True
+    assert result["role_correction"] == {
+        "from": "ce",
+        "to": "ceo",
+    }
+    assert result["fallback_reason"] is None
+    assert len(client.calls) == 1
+
 test_valid_plan()
 test_markdown_fenced_json()
 test_retry_succeeds()
@@ -237,5 +293,7 @@ test_ollama_failure_uses_fallback()
 test_invalid_max_attempts()
 test_empty_query_is_rejected()
 test_deterministic_guardrails_preserve_explicit_roles()
+test_ce_alias_is_normalized_to_ceo()
+
 
 print("LLM Planner retry and fallback tests passed.")

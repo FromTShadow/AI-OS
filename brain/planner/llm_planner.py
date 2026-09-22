@@ -22,6 +22,10 @@ REQUIRED_NEEDS = {
     "ceo",
 }
 
+ROLE_ALIASES = {
+    "ce": "ceo",
+}
+
 
 class PlanValidationError(ValueError):
     """Raised when an LLM-generated plan does not match the required schema."""
@@ -43,10 +47,16 @@ class LLMPlanner:
         self.model = model
         self.max_attempts = max_attempts
 
+    def _prompt(self, query: str) -> str:
+        roles = ", ".join(sorted(SUPPORTED_ROLES))
+
+        return
+
     def build_prompt(self, query: str) -> str:
         roles = ", ".join(sorted(SUPPORTED_ROLES))
 
         return f"""
+
 You are the planning component of AI-OS.
 
 Analyze the user request and return ONLY valid JSON.
@@ -97,6 +107,28 @@ User request:
 {query}
 """.strip()
 
+    def build_repair_prompt(
+        self,
+        original_prompt: str,
+        invalid_response: str,
+        error: Exception,
+    ) -> str:
+        return f"""
+{original_prompt}
+
+Your previous response was rejected by schema validation.
+
+Validation error:
+{type(error).__name__}: {error}
+
+Rejected response:
+{invalid_response}
+
+Return a corrected JSON object only.
+Correct the validation error without adding Markdown or explanation.
+Use complete supported role names exactly as provided.
+""".strip()
+
     def extract_json(self, response: str) -> Dict[str, Any]:
         text = response.strip()
 
@@ -125,6 +157,24 @@ User request:
 
         return data
 
+    def normalize_role(self, role: Any) -> str:
+        if not isinstance(role, str):
+            raise PlanValidationError(
+                "'primary_role' must be a string."
+            )
+
+        normalized = (
+            role.strip()
+            .lower()
+            .replace("-", "_")
+            .replace(" ", "_")
+        )
+
+        return ROLE_ALIASES.get(
+            normalized,
+            normalized,
+        )
+
     def validate(
         self,
         plan: Dict[str, Any],
@@ -150,17 +200,32 @@ User request:
                 "Every value under 'needs' must be boolean."
             )
 
-        primary_role = plan.get("primary_role")
+        original_primary_role = plan.get(
+            "primary_role"
+        )
+        primary_role = self.normalize_role(
+            original_primary_role
+        )
 
         if primary_role not in SUPPORTED_ROLES:
             raise PlanValidationError(
-                f"Unsupported primary role: {primary_role!r}"
+                "Unsupported primary role: "
+                f"{original_primary_role!r}"
             )
 
+        role_correction = None
+
+        if primary_role != original_primary_role:
+            role_correction = {
+                "from": original_primary_role,
+                "to": primary_role,
+            }
+
+        primary_role_needs_correction = False
+
         if not needs[primary_role]:
-            raise PlanValidationError(
-                "The primary role must be enabled under 'needs'."
-            )
+            needs[primary_role] = True
+            primary_role_needs_correction = True
 
         goal = plan.get("goal")
 
@@ -197,6 +262,10 @@ User request:
             "query": query,
             "needs": needs,
             "primary_role": primary_role,
+            "role_correction": role_correction,
+            "primary_role_needs_correction": (
+                primary_role_needs_correction
+            ),
             "goal": goal.strip(),
             "steps": steps,
             "risks": risks,
@@ -242,6 +311,13 @@ User request:
         plan["steps"] = []
         plan["risks"] = []
         plan["success_criteria"] = []
+        plan["role_correction"] = None
+        plan["primary_role_needs_correction"] = False
+        plan["guardrail_roles"] = [
+            role
+            for role, needed in plan["needs"].items()
+            if role != "memory" and needed
+        ]
         plan["planner_type"] = "deterministic_fallback"
         plan["planner_attempts"] = attempts
         plan["fallback_reason"] = reason
@@ -274,11 +350,15 @@ User request:
             raise ValueError("Query cannot be empty.")
 
         errors = []
+        original_prompt = self.build_prompt(cleaned_query)
+        prompt = original_prompt
 
         for attempt in range(1, self.max_attempts + 1):
+            response = None
+
             try:
                 response = self.ollama.chat(
-                    self.build_prompt(cleaned_query),
+                    prompt,
                     model=self.model,
                     temperature=0.0,
                     seed=42,
@@ -301,6 +381,16 @@ User request:
                     f"attempt {attempt}: "
                     f"{type(error).__name__}: {error}"
                 )
+
+                if (
+                    response is not None
+                    and attempt < self.max_attempts
+                ):
+                    prompt = self.build_repair_prompt(
+                        original_prompt=original_prompt,
+                        invalid_response=response,
+                        error=error,
+                    )
 
         return self.fallback_plan(
             cleaned_query,
