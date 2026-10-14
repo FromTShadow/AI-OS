@@ -51,7 +51,7 @@ ROLE_MAX_TOKENS = {
 # PLANNER
 # ======================================================
 
-PLANNER_MODE = "deterministic"
+PLANNER_MODE = "llm"
 
 LLM_PLANNER_MODEL = "qwen3.5:4b"
 

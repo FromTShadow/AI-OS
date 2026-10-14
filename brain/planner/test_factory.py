@@ -30,5 +30,11 @@ else:
         "Unknown planner mode should raise ValueError."
     )
 
+configured_default = create_planner()
+
+assert isinstance(configured_default, LLMPlanner)
+assert configured_default.model == "qwen3.5:4b"
+assert configured_default.max_attempts == 2
+
 
 print("Planner factory test passed.")

@@ -10,7 +10,7 @@ It should always describe reality, not historical notes.
 CURRENT_STATE = {
     "project": "AI-OS",
 
-    "version": "0.3.5-dev",
+    "version": "0.3.6-dev",
 
 
     "modules": {
@@ -24,7 +24,7 @@ CURRENT_STATE = {
         "router": "complete",
         "state_provider": "complete",
         "model_benchmark_v3": "complete",
-        "llm_planner": "planned",
+        "llm_planner": "complete",
         "multi_agent": "planned",
     },
 
@@ -36,6 +36,6 @@ CURRENT_STATE = {
         "open_webui": True,
     },
 
-    "current_focus": "LLM Planner preparation",
-    "next_focus": "LLM Planner prototype",
+    "current_focus": "Multi-agent execution preparation",
+    "next_focus": "Multi-agent execution prototype",
 }
