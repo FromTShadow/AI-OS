@@ -3,38 +3,38 @@ from brain.planner.llm_planner import LLMPlanner
 from brain.planner.planner import Planner
 
 
-deterministic = create_planner(
-    mode="deterministic"
-)
+def test_create_deterministic_planner():
+    planner = create_planner(mode="deterministic")
 
-assert isinstance(deterministic, Planner)
-
-
-llm = create_planner(
-    mode="llm",
-    model="test-model",
-    max_attempts=3,
-)
-
-assert isinstance(llm, LLMPlanner)
-assert llm.model == "test-model"
-assert llm.max_attempts == 3
+    assert isinstance(planner, Planner)
 
 
-try:
-    create_planner(mode="unknown")
-except ValueError as error:
-    assert "Unsupported planner mode" in str(error)
-else:
-    raise AssertionError(
-        "Unknown planner mode should raise ValueError."
+def test_create_llm_planner_with_custom_settings():
+    planner = create_planner(
+        mode="llm",
+        model="test-model",
+        max_attempts=3,
     )
 
-configured_default = create_planner()
-
-assert isinstance(configured_default, LLMPlanner)
-assert configured_default.model == "qwen3.5:4b"
-assert configured_default.max_attempts == 2
+    assert isinstance(planner, LLMPlanner)
+    assert planner.model == "test-model"
+    assert planner.max_attempts == 3
 
 
-print("Planner factory test passed.")
+def test_unknown_planner_mode_is_rejected():
+    try:
+        create_planner(mode="unknown")
+    except ValueError as error:
+        assert "Unsupported planner mode" in str(error)
+    else:
+        raise AssertionError(
+            "Unknown planner mode should raise ValueError."
+        )
+
+
+def test_default_planner_uses_configured_settings():
+    planner = create_planner()
+
+    assert isinstance(planner, LLMPlanner)
+    assert planner.model == "qwen3.5:4b"
+    assert planner.max_attempts == 2

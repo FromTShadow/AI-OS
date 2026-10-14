@@ -66,8 +66,7 @@ Primary software engineering assistant for the AI Operating System.
 
 ## Base Model
 
-qwen3:14b
-
+`qwen3:14b` — documented default model; actual model selection is controlled by the AI-OS configuration and routing.
 ## Status
 
 Active

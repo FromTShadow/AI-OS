@@ -55,6 +55,12 @@ Convert information into useful knowledge for the Second Brain.
 
 qwen3:14b
 
+## Implementation Status
+
+Research, analysis, summarization, and structured report generation are intended responsibilities.
+
+Persistent autonomous research sessions, iterative internet research, and coordinated research specialists remain future capabilities unless separately implemented and validated.
+
 ## Status
 
 Active

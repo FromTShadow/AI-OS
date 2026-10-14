@@ -63,6 +63,12 @@ Turn Obsidian into a searchable AI-powered second brain.
 
 qwen3:14b
 
+## Implementation Status
+
+The Obsidian vault and semantic indexing infrastructure are part of AI-OS.
+
+Automatic note curation, reliable long-term memory maintenance, and autonomous knowledge organization should be treated as separate capabilities that require implementation and validation.
+
 ## Status
 
 Active

@@ -7,8 +7,10 @@ __pycache__/
 venv/
 .venv/
 
-# Environment variables
+# Environment variables and local secrets
 .env
+.env.*
+!.env.example
 
 # macOS
 .DS_Store

@@ -283,17 +283,3 @@ def test_ce_alias_is_normalized_to_ceo():
     }
     assert result["fallback_reason"] is None
     assert len(client.calls) == 1
-
-test_valid_plan()
-test_markdown_fenced_json()
-test_retry_succeeds()
-test_both_attempts_fail()
-test_invalid_role_uses_fallback()
-test_ollama_failure_uses_fallback()
-test_invalid_max_attempts()
-test_empty_query_is_rejected()
-test_deterministic_guardrails_preserve_explicit_roles()
-test_ce_alias_is_normalized_to_ceo()
-
-
-print("LLM Planner retry and fallback tests passed.")

@@ -1,42 +1,25 @@
 from brain.benchmarks.model_benchmark_v2 import BenchmarkCasesV2
 
 
-benchmark = BenchmarkCasesV2()
+def test_benchmark_v2_contains_twelve_cases():
+    cases = BenchmarkCasesV2().cases()
 
-cases = benchmark.cases()
-
-print("Total cases:", len(cases))
-
-for case in cases:
-    print(
-        case.category,
-        "->",
-        case.name,
-    )
+    assert len(cases) == 12
 
 
-assert len(cases) == 12
+def test_benchmark_v2_covers_expected_categories():
+    cases = BenchmarkCasesV2().cases()
 
-categories = {
-    case.category
-    for case in cases
-}
-
-assert categories == {
-    "planning",
-    "coding",
-    "research",
-    "reasoning",
-}
-
-for category in categories:
-    count = sum(
-        1
-        for case in cases
-        if case.category == category
-    )
-
-    assert count == 3
+    assert {case.category for case in cases} == {
+        "planning",
+        "coding",
+        "research",
+        "reasoning",
+    }
 
 
-print("\nBenchmark V2 structure test passed.")
+def test_benchmark_v2_has_three_cases_per_category():
+    cases = BenchmarkCasesV2().cases()
+
+    for category in {"planning", "coding", "research", "reasoning"}:
+        assert sum(case.category == category for case in cases) == 3
